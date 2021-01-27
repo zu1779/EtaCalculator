@@ -1,9 +1,12 @@
 ﻿namespace Zu1779.EtaCalculator
 {
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Timers;
+    using Humanizer;
 
-    //TODO: decide to change StopWatch with a injectable interface
     //TODO: unit testing project
     //TODO: using something like unitsnet for showing measures?
     //TODO: integration with quartz?
@@ -11,119 +14,125 @@
     //TODO: integrate classic for cycle for data acquisition?
     //TODO: integrate a conditional dump of the state based on count or time gap
 
-    public class EtaCalculator
+    //TODO: implement an option to never approximate to (done 100% or todo 0%) if not really finished
+
+    public class EtaCalculator : IEtaCalculator
     {
-        public EtaCalculator() => stopwatch = new Stopwatch();
-        private readonly Stopwatch stopwatch;
-
-        public DateTimeOffset? UtcStart { get; private set; }
-        public DateTimeOffset? UtcStop => (!UtcStart.HasValue || !TotalTime.HasValue) ? null : UtcStart.Value.Add(TotalTime.Value);
-
-        public decimal Total { get; set; }
-        public decimal Done { get; set; }
-        public decimal ToDo
+        public EtaCalculator(IStopwatch stopwatch = null)
         {
-            get => Total - Done;
-            set => Done = Total - ToDo;
+            this.stopwatch = stopwatch ?? new StopwatchWrapper();
+            thresholdTimer.Elapsed += (s, e) => Progress?.Invoke(this, new EtaTimeEventArgs { Done = Done, Total = Total });
         }
 
-        public decimal DoneProportion
+        private readonly IStopwatch stopwatch;
+        private readonly Timer thresholdTimer = new Timer { AutoReset = true, Enabled = false, };
+        private void StartThresholdTimer()
+        {
+            if (!thresholdTimer.Enabled && TimeThreshold.HasValue)
+            {
+                thresholdTimer.Interval = TimeThreshold.Value.TotalMilliseconds;
+                thresholdTimer.Start();
+            }
+        }
+        private void StopThresholdTimer()
+        {
+            if (thresholdTimer.Enabled) thresholdTimer.Stop();
+        }
+
+        public event EventHandler<EtaEventArgs> Progress;
+
+        public DateTimeOffset? StartTime { get; private set; }
+        public DateTimeOffset? StopTime
+        {
+            get
+            {
+                if (!StartTime.HasValue || !TotalTime.HasValue) return null;
+                else return StartTime.Value.Add(TotalTime.Value);
+            }
+        }
+
+        public double? Total { get; set; }
+        private double done;
+        public double Done
+        {
+            get => done;
+            set
+            {
+                done = value;
+                if (done == Total)
+                {
+                    stopwatch.Stop();
+                    StopThresholdTimer();
+                }
+                // Consider threshold as percentage
+                if (CountThreshold >= 0 && CountThreshold < 1)
+                {
+                    // Check if _done pass thresold
+                }
+                else if (CountThreshold >= 1)
+                {
+                    if (done % CountThreshold == 0) Progress?.Invoke(this, new EtaCountEventArgs { Done = done, Total = Total });
+                }
+            }
+        }
+        public double? DoneProportion
         {
             get => Done / Total;
-            set => Done = value * Total;
+            set => Done = (value * Total) ?? 0;
         }
-        public decimal ToDoProportion => 1 - DoneProportion;
+        public double? ToDo
+        {
+            get => Total - Done;
+            set => Done = (Total - ToDo) ?? 0;
+        }
+        public double? ToDoProportion
+        {
+            get => 1 - DoneProportion;
+            set => DoneProportion = 1 - value;
+        }
 
-        public TimeSpan? TotalTime => 
-            Done == 0 ? null : TimeSpan.FromMilliseconds(stopwatch.Elapsed.TotalMilliseconds / (double)Done * (double)Total);
+        public double? CountThreshold { get; set; }
+        public TimeSpan? TimeThreshold { get; set; }
+
+        public TimeSpan? TotalTime
+        {
+            get
+            {
+                if (!Total.HasValue || Done == 0) return null;
+                else return TimeSpan.FromMilliseconds(stopwatch.Elapsed.TotalMilliseconds / Done * Total.Value);
+            }
+        }
         public TimeSpan DoneTime => stopwatch.Elapsed;
         public TimeSpan? ToDoTime => TotalTime?.Subtract(DoneTime);
 
-        public double ItemPerSecond => (double)Done / DoneTime.TotalSeconds;
-
-        /// <summary>
-        /// Gets a value indicating whether the System.Diagnostics.Stopwatch timer is running.
-        /// </summary>
-        public bool IsRunning => stopwatch.IsRunning;
-
-        /// <summary>
-        /// Gets the total elapsed time measured by the current instance.
-        /// </summary>
-        public TimeSpan Elapsed => stopwatch.Elapsed;
-        /// <summary>
-        /// Gets the total elapsed time measured by the current instance, in milliseconds.
-        /// </summary>
-        public long ElapsedMilliseconds => stopwatch.ElapsedMilliseconds;
-        /// <summary>
-        /// Gets the total elapsed time measured by the current instance, in timer ticks.
-        /// </summary>
-        public long ElapsedTicks { get { return stopwatch.ElapsedTicks; } }
+        public double? ItemPerSecond => Done > 0 && DoneTime > TimeSpan.Zero ? Done / DoneTime.TotalSeconds : null;
 
         #region Management
-        /// <summary>
-        /// Starts, or resumes, measuring elapsed time for an interval.
-        /// </summary>
-        public void Start()
+        public IEtaCalculator Start()
         {
-            UtcStart = DateTimeOffset.UtcNow;
+            StartTime = DateTimeOffset.Now;
             stopwatch.Start();
+            StartThresholdTimer();
+            return this;
         }
-        /// <summary>
-        ///  Stops time interval measurement, resets the elapsed time to zero, and starts measuring elapsed time.
-        /// </summary>
-        public void Restart() => stopwatch.Restart();
-        /// <summary>
-        /// Stops measuring elapsed time for an interval.
-        /// </summary>
-        public void Stop() => stopwatch.Stop();
-        public void Complete() => Done = Total;
-        /// <summary>
-        /// Stops time interval measurement and resets the elapsed time to zero.
-        /// </summary>
-        public void Reset() => stopwatch.Reset();
+        public IEtaCalculator Advance(double done)
+        {
+            Done = done;
+            return this;
+        }
+        public IEtaCalculator Complete()
+        {
+            Done = Total ?? double.MaxValue;
+            return this;
+        }
         #endregion
 
         public override string ToString()
         {
-            return $"Tot: {Total:n0} [{TotalTime.ToUMStr()}] - Done: {Done:n0} ({DoneProportion:p}) [{DoneTime.ToUMStr()}] - ToDo: {ToDo:n0} ({ToDoProportion:p}) [{ToDoTime.ToUMStr()}] => {ItemPerSecond:n} item/s., From {UtcStart:d} {UtcStart:t} To {UtcStop:d} {UtcStop:t}";
+            return $"Tot: {Total:n0} [{TotalTime?.Humanize()}] - " +
+                $"Done: {Done:n0} ({DoneProportion:p0}) [{DoneTime.Humanize()}] - " +
+                $"ToDo: {ToDo:n0} ({ToDoProportion:p0}) [{ToDoTime?.Humanize()}] => " +
+                $"{ItemPerSecond:n} item/s, From {StartTime:d} {StartTime:t} To {StopTime:d} {StopTime:t}";
         }
-        public string ToString(decimal done)
-        {
-            Done = done;
-            return ToString();
-        }
-
-        #region Static methods
-        /// <summary>
-        /// Gets the frequency of the timer as the number of ticks per second. This field is read-only.
-        /// </summary>
-        public static long Frequency => Stopwatch.Frequency;
-
-        /// <summary>
-        /// Indicates whether the timer is based on a high-resolution performance counter. This field is read-only.
-        /// </summary>
-        public static bool IsHighResolution => Stopwatch.IsHighResolution;
-
-        /// <summary>
-        /// Gets the current number of ticks in the timer mechanism.
-        /// </summary>
-        /// <returns>A long integer representing the tick counter value of the underlying timer mechanism.</returns>
-        public static long GetTimestamp() => Stopwatch.GetTimestamp();
-
-        /// <summary>
-        /// Initializes a new System.Diagnostics.Stopwatch instance, sets the elapsed time property to zero, and starts measuring elapsed time.
-        /// </summary>
-        /// <returns>A System.Diagnostics.Stopwatch that has just begun measuring elapsed time.</returns>
-        public static EtaCalculator StartNew(decimal total = 100, decimal done = 0)
-        {
-            var ew = new EtaCalculator
-            {
-                Total = total,
-                Done = done,
-            };
-            ew.Start();
-            return ew;
-        }
-        #endregion
     }
 }

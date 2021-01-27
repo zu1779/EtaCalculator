@@ -14,4 +14,8 @@
     <Company>Zu1779</Company>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Humanizer.Core" Version="2.8.26" />
+  </ItemGroup>
+
 </Project>

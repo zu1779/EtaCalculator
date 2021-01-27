@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zu1779.EtaCalculator", "Zu1779.EtaCalculator\Zu1779.EtaCalculator.csproj", "{D224DE5E-20D0-444B-A7C2-A89CC53D7ADE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zu1779.EtaCalculator", "Zu1779.EtaCalculator\Zu1779.EtaCalculator.csproj", "{D224DE5E-20D0-444B-A7C2-A89CC53D7ADE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleTest", "ConsoleTest\ConsoleTest.csproj", "{125ED262-AAEC-414C-AD02-1E0C0F6A696A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zu1779.EtaCalculator.AT", "Zu1779.EtaCalculator.AT\Zu1779.EtaCalculator.AT.csproj", "{8C5C7949-4CBF-4425-B534-3CF35AD3851D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{D224DE5E-20D0-444B-A7C2-A89CC53D7ADE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D224DE5E-20D0-444B-A7C2-A89CC53D7ADE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D224DE5E-20D0-444B-A7C2-A89CC53D7ADE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{125ED262-AAEC-414C-AD02-1E0C0F6A696A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{125ED262-AAEC-414C-AD02-1E0C0F6A696A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{125ED262-AAEC-414C-AD02-1E0C0F6A696A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{125ED262-AAEC-414C-AD02-1E0C0F6A696A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C5C7949-4CBF-4425-B534-3CF35AD3851D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C5C7949-4CBF-4425-B534-3CF35AD3851D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C5C7949-4CBF-4425-B534-3CF35AD3851D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C5C7949-4CBF-4425-B534-3CF35AD3851D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
