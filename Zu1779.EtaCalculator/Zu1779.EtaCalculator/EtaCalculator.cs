@@ -15,13 +15,14 @@
     //TODO: integrate a conditional dump of the state based on count or time gap
 
     //TODO: implement an option to never approximate to (done 100% or todo 0%) if not really finished
+    //TODO: implement the possibility to choose the data span from which calculate statistics (all, last minute, last timespan)
 
     public class EtaCalculator : IEtaCalculator
     {
         public EtaCalculator(IStopwatch stopwatch = null)
         {
             this.stopwatch = stopwatch ?? new StopwatchWrapper();
-            thresholdTimer.Elapsed += (s, e) => Progress?.Invoke(this, new EtaTimeEventArgs { Done = Done, Total = Total });
+            thresholdTimer.Elapsed += (s, e) => OnTimeProgress(Done, Total.Value);
         }
 
         private readonly IStopwatch stopwatch;
@@ -39,7 +40,22 @@
             if (thresholdTimer.Enabled) thresholdTimer.Stop();
         }
 
+        public event EventHandler<EtaCountEventArgs> CountProgress;
+        public event EventHandler<EtaTimeEventArgs> TimeProgress;
         public event EventHandler<EtaEventArgs> Progress;
+        private void OnCountProgress(double done, double? total)
+        {
+            var e = new EtaCountEventArgs { Done = done, Total = total };
+            CountProgress?.Invoke(this, e);
+            onProgress(e);
+        }
+        private void OnTimeProgress(double done, double? total)
+        {
+            var e = new EtaTimeEventArgs { Done = done, Total = total };
+            TimeProgress?.Invoke(this, e);
+            onProgress(e);
+        }
+        private void onProgress(EtaEventArgs e) => Progress?.Invoke(this, e);
 
         public DateTimeOffset? StartTime { get; private set; }
         public DateTimeOffset? StopTime
@@ -71,7 +87,7 @@
                 }
                 else if (CountThreshold >= 1)
                 {
-                    if (done % CountThreshold == 0) Progress?.Invoke(this, new EtaCountEventArgs { Done = done, Total = Total });
+                    if (done % CountThreshold == 0) OnCountProgress(Done, Total);
                 }
             }
         }

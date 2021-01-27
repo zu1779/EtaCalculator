@@ -77,6 +77,17 @@
             }
         }
 
+        /// <summary>
+        /// Event raised each time a count progress is reached
+        /// </summary>
+        event EventHandler<EtaCountEventArgs> CountProgress;
+        /// <summary>
+        /// Event raised each time a time progress is reached
+        /// </summary>
+        event EventHandler<EtaTimeEventArgs> TimeProgress;
+        /// <summary>
+        /// Event raised each time a count progress or a time progress is reached
+        /// </summary>
         event EventHandler<EtaEventArgs> Progress;
     }
 }
