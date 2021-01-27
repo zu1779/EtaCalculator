@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30907.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zu1779.EtaCalculator", "Zu1779.EtaCalculator\Zu1779.EtaCalculator.csproj", "{D224DE5E-20D0-444B-A7C2-A89CC53D7ADE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D224DE5E-20D0-444B-A7C2-A89CC53D7ADE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D224DE5E-20D0-444B-A7C2-A89CC53D7ADE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D224DE5E-20D0-444B-A7C2-A89CC53D7ADE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D224DE5E-20D0-444B-A7C2-A89CC53D7ADE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {89B0F28C-5995-4752-BA3C-9A63989575DF}
+	EndGlobalSection
+EndGlobal
