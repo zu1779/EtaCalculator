@@ -7,11 +7,7 @@
     public interface IEtaCalculator
     {
         double? Total { get; set; }
-        IEtaCalculator SetTotal(double? total)
-        {
-            Total = total;
-            return this;
-        }
+        IEtaCalculator SetTotal(double? total);
         double Done { get; set; }
         IEtaCalculator SetDone(double done)
         {
@@ -63,8 +59,8 @@
         /// <summary>
         /// Advance task progress. Alias of setting <see cref="Done"/> property.
         /// </summary>
-        /// <param name="done">New value of task progress.</param>
-        IEtaCalculator Advance(double done);
+        /// <param name="progressAdd">Valut to add to task progress.</param>
+        IEtaCalculator Advance(double progressAdd);
         IEtaCalculator Complete();
 
         IEnumerable<T> TrackProgress<T>(IEnumerable<T> ien)

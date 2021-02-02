@@ -5,17 +5,18 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Timers;
-    using Humanizer;
 
-    //TODO: unit testing project
-    //TODO: using something like unitsnet for showing measures?
-    //TODO: integration with quartz?
-    //TODO: integrate with iqueryable for automatic foreach data acquisition
+    using Zu1779.GenUtil;
+
     //TODO: integrate classic for cycle for data acquisition?
     //TODO: integrate a conditional dump of the state based on count or time gap
 
     //TODO: implement an option to never approximate to (done 100% or todo 0%) if not really finished
     //TODO: implement the possibility to choose the data span from which calculate statistics (all, last minute, last timespan)
+
+    //TODO: check optional nuget to use as plugin
+    //TODO: refactoring with EtaCalculator state (stopped, ...)
+    //TODO: decide what to do in a unknown total state, and refactoring accordingly
 
     public class EtaCalculator : IEtaCalculator
     {
@@ -27,6 +28,7 @@
 
         private readonly IStopwatch stopwatch;
         private readonly Timer thresholdTimer = new Timer { AutoReset = true, Enabled = false, };
+        private double? lastCountProgress;
         private void StartThresholdTimer()
         {
             if (!thresholdTimer.Enabled && TimeThreshold.HasValue)
@@ -47,15 +49,15 @@
         {
             var e = new EtaCountEventArgs { Done = done, Total = total };
             CountProgress?.Invoke(this, e);
-            onProgress(e);
+            OnProgress(e);
         }
         private void OnTimeProgress(double done, double? total)
         {
             var e = new EtaTimeEventArgs { Done = done, Total = total };
             TimeProgress?.Invoke(this, e);
-            onProgress(e);
+            OnProgress(e);
         }
-        private void onProgress(EtaEventArgs e) => Progress?.Invoke(this, e);
+        private void OnProgress(EtaEventArgs e) => Progress?.Invoke(this, e);
 
         public DateTimeOffset? StartTime { get; private set; }
         public DateTimeOffset? StopTime
@@ -83,10 +85,11 @@
                 // Consider threshold as percentage
                 if (CountThreshold >= 0 && CountThreshold < 1)
                 {
-                    // Check if _done pass thresold
+                    //TODO: Check if _done pass thresold
                 }
                 else if (CountThreshold >= 1)
                 {
+                    //TODO: implement a raise mode to permit advance of values different of 1
                     if (done % CountThreshold == 0) OnCountProgress(Done, Total);
                 }
             }
@@ -131,9 +134,10 @@
             StartThresholdTimer();
             return this;
         }
-        public IEtaCalculator Advance(double done)
+        public IEtaCalculator Advance(double progressAdd)
         {
-            Done = done;
+            Done += progressAdd;
+            if (Total.HasValue) Done = Done.MaxCap(Total.Value);
             return this;
         }
         public IEtaCalculator Complete()
@@ -145,9 +149,9 @@
 
         public override string ToString()
         {
-            return $"Tot: {Total:n0} [{TotalTime?.Humanize()}] - " +
-                $"Done: {Done:n0} ({DoneProportion:p0}) [{DoneTime.Humanize()}] - " +
-                $"ToDo: {ToDo:n0} ({ToDoProportion:p0}) [{ToDoTime?.Humanize()}] => " +
+            return $"Tot: {Total:n0} [{TotalTime}] - " +
+                $"Done: {Done:n0} ({DoneProportion:p0}) [{DoneTime}] - " +
+                $"ToDo: {ToDo:n0} ({ToDoProportion:p0}) [{ToDoTime}] => " +
                 $"{ItemPerSecond:n} item/s, From {StartTime:d} {StartTime:t} To {StopTime:d} {StopTime:t}";
         }
     }

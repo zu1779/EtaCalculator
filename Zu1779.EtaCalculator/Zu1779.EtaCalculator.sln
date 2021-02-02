@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zu1779.EtaCalculator", "Zu1
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleTest", "ConsoleTest\ConsoleTest.csproj", "{125ED262-AAEC-414C-AD02-1E0C0F6A696A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zu1779.EtaCalculator.AT", "Zu1779.EtaCalculator.AT\Zu1779.EtaCalculator.AT.csproj", "{8C5C7949-4CBF-4425-B534-3CF35AD3851D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zu1779.EtaCalculator.AT", "Zu1779.EtaCalculator.AT\Zu1779.EtaCalculator.AT.csproj", "{8C5C7949-4CBF-4425-B534-3CF35AD3851D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A3FDB22D-9101-4DBA-A654-C6CBF855D048}"
+	ProjectSection(SolutionItems) = preProject
+		..\README.md = ..\README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
