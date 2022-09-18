@@ -28,7 +28,7 @@
 
         private readonly IStopwatch stopwatch;
         private readonly Timer thresholdTimer = new Timer { AutoReset = true, Enabled = false, };
-        private double? lastCountProgress;
+        //private double? lastCountProgress;
         private void StartThresholdTimer()
         {
             if (!thresholdTimer.Enabled && TimeThreshold.HasValue)
@@ -153,6 +153,12 @@
                 $"Done: {Done:n0} ({DoneProportion:p0}) [{DoneTime}] - " +
                 $"ToDo: {ToDo:n0} ({ToDoProportion:p0}) [{ToDoTime}] => " +
                 $"{ItemPerSecond:n} item/s, From {StartTime:d} {StartTime:t} To {StopTime:d} {StopTime:t}";
+        }
+
+        public IEtaCalculator SetTotal(double? total)
+        {
+            Total = total;
+            return this;
         }
     }
 }

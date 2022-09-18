@@ -13,7 +13,7 @@
             new Program().Run();
 
             "\r\n\r\nPress any key".Dump();
-            Console.ReadKey();
+            //Console.ReadKey();
         }
 
         //const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -25,8 +25,8 @@
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
         public void Run()
         {
-            Console.LargestWindowWidth.Dump(nameof(Console.LargestWindowWidth));
-            Console.WindowWidth = (int)Math.Floor(Console.LargestWindowWidth * 0.9);
+            // Console.LargestWindowWidth.Dump(nameof(Console.LargestWindowWidth));
+            // Console.WindowWidth = (int)Math.Floor(Console.LargestWindowWidth * 0.9);
 
             var collection = new List<string>(nr);
 
