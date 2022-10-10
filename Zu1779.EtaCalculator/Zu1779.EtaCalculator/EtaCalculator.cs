@@ -149,9 +149,9 @@
 
         public override string ToString()
         {
-            return $"Tot: {Total:n0} [{TotalTime}] - " +
-                $"Done: {Done:n0} ({DoneProportion:p0}) [{DoneTime}] - " +
-                $"ToDo: {ToDo:n0} ({ToDoProportion:p0}) [{ToDoTime}] => " +
+            return $"Tot: {Total:n0} [{TotalTime:d\\.hh\\:mm\\:ss}] - " +
+                $"Done: {Done:n0} ({DoneProportion:p0}) [{DoneTime:d\\.hh\\:mm\\:ss}] - " +
+                $"ToDo: {ToDo:n0} ({ToDoProportion:p0}) [{ToDoTime:d\\.hh\\:mm\\:ss}] => " +
                 $"{ItemPerSecond:n} item/s, From {StartTime:d} {StartTime:t} To {StopTime:d} {StopTime:t}";
         }
 
