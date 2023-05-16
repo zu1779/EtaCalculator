@@ -17,15 +17,15 @@ namespace Zu1779.EtaCalculator;
 
 public class EtaCalculator : IEtaCalculator
 {
-    public EtaCalculator(IStopwatch stopwatch = null)
+    public EtaCalculator(IStopwatch? stopwatch = null)
     {
         this.stopwatch = stopwatch ?? new StopwatchWrapper();
-        thresholdTimer.Elapsed += (s, e) => OnTimeProgress(Done, Total.Value);
+        thresholdTimer.Elapsed += (s, e) => OnTimeProgress(Done, Total);
     }
 
     private readonly IStopwatch stopwatch;
     private readonly Timer thresholdTimer = new Timer { AutoReset = true, Enabled = false, };
-    //private double? lastCountProgress;
+
     private void StartThresholdTimer()
     {
         if (!thresholdTimer.Enabled && TimeThreshold.HasValue)
@@ -39,9 +39,9 @@ public class EtaCalculator : IEtaCalculator
         if (thresholdTimer.Enabled) thresholdTimer.Stop();
     }
 
-    public event EventHandler<EtaCountEventArgs> CountProgress;
-    public event EventHandler<EtaTimeEventArgs> TimeProgress;
-    public event EventHandler<EtaEventArgs> Progress;
+    public event EventHandler<EtaCountEventArgs>? CountProgress;
+    public event EventHandler<EtaTimeEventArgs>? TimeProgress;
+    public event EventHandler<EtaEventArgs>? Progress;
     private void OnCountProgress(double done, double? total)
     {
         var e = new EtaCountEventArgs { Done = done, Total = total };
@@ -65,6 +65,11 @@ public class EtaCalculator : IEtaCalculator
             else return StartTime.Value.Add(TotalTime.Value);
         }
     }
+
+    /// <summary>
+    /// Save a custom object. Main use: save current item of progression.
+    /// </summary>
+    public object? Tag { get; set; }
 
     public double? Total { get; set; }
     private double done;
@@ -139,7 +144,8 @@ public class EtaCalculator : IEtaCalculator
     }
     public IEtaCalculator Complete()
     {
-        Done = Total ?? double.MaxValue;
+        Total = Done;
+        StopThresholdTimer();
         return this;
     }
     #endregion
@@ -150,6 +156,13 @@ public class EtaCalculator : IEtaCalculator
             $"Done: {Done:n0} ({DoneProportion:p0}) [{DoneTime:d\\.hh\\:mm\\:ss}] - " +
             $"ToDo: {ToDo:n0} ({ToDoProportion:p0}) [{ToDoTime:d\\.hh\\:mm\\:ss}] => " +
             $"{ItemPerSecond:n} item/s, From {StartTime:d} {StartTime:t} To {StopTime:d} {StopTime:t}";
+    }
+    public string ToString(Func<double, string> progressFormatter)
+    {
+        return $"Tot: {progressFormatter(Total ?? 0):n0} [{TotalTime:d\\.hh\\:mm\\:ss}] - " +
+            $"Done: {progressFormatter(Done):n0} ({DoneProportion:p0}) [{DoneTime:d\\.hh\\:mm\\:ss}] - " +
+            $"ToDo: {progressFormatter(ToDo ?? 0):n0} ({ToDoProportion:p0}) [{ToDoTime:d\\.hh\\:mm\\:ss}] => " +
+            $"{progressFormatter(ItemPerSecond ?? 0):n}/s, From {StartTime:d} {StartTime:t} To {StopTime:d} {StopTime:t}";
     }
 
     public IEtaCalculator SetTotal(double? total)
